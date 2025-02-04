@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { ArrowLeft, User, Phone, MapPin, Building2, Star } from 'lucide-react';
+import React, { useState, useRef } from 'react';
+import { ArrowLeft, User, Phone, MapPin, Building2, Star, Upload, X } from 'lucide-react';
 
 interface ServiceRegistrationProps {
   type: 'House Maid' | 'Carpenter';
@@ -13,8 +13,12 @@ function ServiceRegistration({ type, onSubmit, onBack }: ServiceRegistrationProp
     phoneNumber: '',
     city: '',
     area: '',
-    rating: '5'
+    rating: '5',
+    image: ''
   });
+
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,6 +30,32 @@ function ServiceRegistration({ type, onSubmit, onBack }: ServiceRegistrationProp
       ...formData,
       [e.target.name]: e.target.value
     });
+  };
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) { // 5MB limit
+        alert('Image size should be less than 5MB');
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64String = reader.result as string;
+        setPreviewImage(base64String);
+        setFormData(prev => ({ ...prev, image: base64String }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const removeImage = () => {
+    setPreviewImage(null);
+    setFormData(prev => ({ ...prev, image: '' }));
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
   };
 
   return (
@@ -43,6 +73,58 @@ function ServiceRegistration({ type, onSubmit, onBack }: ServiceRegistrationProp
           <h2 className="text-2xl font-bold text-gray-900 mb-6">Register New {type}</h2>
 
           <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Image Upload Section */}
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">
+                Profile Image
+              </label>
+              <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg">
+                <div className="space-y-1 text-center">
+                  {previewImage ? (
+                    <div className="relative inline-block">
+                      <img
+                        src={previewImage}
+                        alt="Preview"
+                        className="max-h-40 rounded-lg"
+                      />
+                      <button
+                        type="button"
+                        onClick={removeImage}
+                        className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ) : (
+                    <>
+                      <Upload className="mx-auto h-12 w-12 text-gray-400" />
+                      <div className="flex text-sm text-gray-600">
+                        <label
+                          htmlFor="file-upload"
+                          className="relative cursor-pointer bg-white rounded-md font-medium text-[#ff5757] hover:text-[#ff3d3d] focus-within:outline-none"
+                        >
+                          <span>Upload a file</span>
+                          <input
+                            id="file-upload"
+                            name="file-upload"
+                            type="file"
+                            ref={fileInputRef}
+                            className="sr-only"
+                            accept="image/*"
+                            onChange={handleImageUpload}
+                          />
+                        </label>
+                        <p className="pl-1">or drag and drop</p>
+                      </div>
+                      <p className="text-xs text-gray-500">
+                        PNG, JPG, GIF up to 5MB
+                      </p>
+                    </>
+                  )}
+                </div>
+              </div>
+            </div>
+
             <div className="space-y-2">
               <label htmlFor="name" className="block text-sm font-medium text-gray-700">
                 Full Name
