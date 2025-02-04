@@ -19,6 +19,21 @@ function Dashboard({ onLogout }: { onLogout: () => void }) {
   const [registeredMaids, setRegisteredMaids] = useState<any[]>([]);
   const [registeredCarpenters, setRegisteredCarpenters] = useState<any[]>([]);
 
+  const carpenterImages = [
+    "https://images.unsplash.com/photo-1622150162807-20e8607f65c3?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1617104551722-3b2d51366400?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1601058268499-e52658b8bb88?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80"
+  ];
+
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  React.useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentImageIndex((prev) => (prev + 1) % carpenterImages.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, []);
+
   const handleMaidRegistration = (data: any) => {
     setRegisteredMaids([...registeredMaids, { ...data, type: 'maid' }]);
     setCurrentView('dashboard');
@@ -94,46 +109,79 @@ function Dashboard({ onLogout }: { onLogout: () => void }) {
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* House Maid Section */}
-          <div className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow p-6">
-            <div className="flex items-center mb-4">
-              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600 mr-4">
-                <Mop className="w-6 h-6" />
-              </div>
-              <div>
-                <h2 className="text-xl font-semibold text-gray-900">House Maid</h2>
-                <p className="text-gray-600">Register and manage house maid services</p>
-              </div>
+          <div className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow overflow-hidden">
+            <div className="h-48 overflow-hidden">
+              <img 
+                src="https://images.unsplash.com/photo-1584820927498-cfe5211fd8bf?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" 
+                alt="House Cleaning Service"
+                className="w-full h-full object-cover"
+              />
             </div>
-            <div className="space-y-4">
-              <button
-                onClick={() => setCurrentView('register-maid')}
-                className="w-full bg-blue-50 text-blue-600 py-2 px-4 rounded-lg hover:bg-blue-100 transition-colors flex items-center justify-center space-x-2"
-              >
-                <Users className="w-5 h-5" />
-                <span>Register New Maid</span>
-              </button>
+            <div className="p-6">
+              <div className="flex items-center mb-4">
+                <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600 mr-4">
+                  <Mop className="w-6 h-6" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-semibold text-gray-900">House Maid</h2>
+                  <p className="text-gray-600">Register and manage house maid services</p>
+                </div>
+              </div>
+              <div className="space-y-4">
+                <button
+                  onClick={() => setCurrentView('register-maid')}
+                  className="w-full bg-blue-50 text-blue-600 py-2 px-4 rounded-lg hover:bg-blue-100 transition-colors flex items-center justify-center space-x-2"
+                >
+                  <Users className="w-5 h-5" />
+                  <span>Register New Maid</span>
+                </button>
+              </div>
             </div>
           </div>
 
           {/* Carpenter Section */}
-          <div className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow p-6">
-            <div className="flex items-center mb-4">
-              <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center text-orange-600 mr-4">
-                <Tool className="w-6 h-6" />
-              </div>
-              <div>
-                <h2 className="text-xl font-semibold text-gray-900">Carpenter</h2>
-                <p className="text-gray-600">Register and manage carpenter services</p>
+          <div className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow overflow-hidden">
+            <div className="h-48 overflow-hidden relative">
+              {carpenterImages.map((img, index) => (
+                <img 
+                  key={index}
+                  src={img}
+                  alt={`Carpentry Service ${index + 1}`}
+                  className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${
+                    index === currentImageIndex ? 'opacity-100' : 'opacity-0'
+                  }`}
+                />
+              ))}
+              <div className="absolute bottom-2 right-2 flex space-x-1">
+                {carpenterImages.map((_, index) => (
+                  <div
+                    key={index}
+                    className={`w-2 h-2 rounded-full ${
+                      index === currentImageIndex ? 'bg-white' : 'bg-white/50'
+                    }`}
+                  />
+                ))}
               </div>
             </div>
-            <div className="space-y-4">
-              <button
-                onClick={() => setCurrentView('register-carpenter')}
-                className="w-full bg-orange-50 text-orange-600 py-2 px-4 rounded-lg hover:bg-orange-100 transition-colors flex items-center justify-center space-x-2"
-              >
-                <Users className="w-5 h-5" />
-                <span>Register New Carpenter</span>
-              </button>
+            <div className="p-6">
+              <div className="flex items-center mb-4">
+                <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center text-orange-600 mr-4">
+                  <Tool className="w-6 h-6" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-semibold text-gray-900">Carpenter</h2>
+                  <p className="text-gray-600">Register and manage carpenter services</p>
+                </div>
+              </div>
+              <div className="space-y-4">
+                <button
+                  onClick={() => setCurrentView('register-carpenter')}
+                  className="w-full bg-orange-50 text-orange-600 py-2 px-4 rounded-lg hover:bg-orange-100 transition-colors flex items-center justify-center space-x-2"
+                >
+                  <Users className="w-5 h-5" />
+                  <span>Register New Carpenter</span>
+                </button>
+              </div>
             </div>
           </div>
         </div>
