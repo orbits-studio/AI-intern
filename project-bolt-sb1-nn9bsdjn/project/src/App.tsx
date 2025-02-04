@@ -187,12 +187,9 @@ function App() {
 
   return (
     <div 
-      className="min-h-screen flex items-center justify-center p-4"
+      className="min-h-screen flex items-center justify-center p-4 bg-cover bg-center bg-no-repeat"
       style={{
-        background: 'linear-gradient(135deg, #4a1d96 0%, #312e81 100%)',
-        backgroundImage: `url('https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1974&q=80')`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
+        backgroundImage: `linear-gradient(rgba(74, 29, 150, 0.8), rgba(49, 46, 129, 0.8)), url('https://pin.it/53hvB1hHX?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1974&q=80')`,
         backgroundBlendMode: 'multiply'
       }}
     >
