@@ -1,8 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Mail, Lock, Eye, EyeOff, AlertCircle } from 'lucide-react';
 import Dashboard from './components/Dashboard';
 import ForgotPassword from './components/ForgotPassword';
 import SignUp from './components/SignUp';
+import { supabase } from './lib/supabase';
+import { signIn, signOut } from './lib/auth';
+import type { User } from '@supabase/supabase-js';
 
 function App() {
   const [email, setEmail] = useState('');
@@ -10,44 +13,42 @@ function App() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
   const [view, setView] = useState<'login' | 'forgot-password' | 'signup'>('login');
+
+  useEffect(() => {
+    // Check active sessions and sets the user
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+    });
+
+    // Listen for changes on auth state (signed in, signed out, etc.)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError('');
 
-    // Simulate API call
-    setTimeout(() => {
-      if (email.includes('@') && password.length >= 6) {
-        setIsLoggedIn(true);
-      } else {
-        setError('Invalid email or password');
-      }
-      setIsLoading(false);
-    }, 1000);
+    const error = await signIn(email, password);
+    if (error) {
+      setError(error.message);
+    }
+    setIsLoading(false);
   };
 
-  const handleLogout = () => {
-    setIsLoggedIn(false);
+  const handleLogout = async () => {
+    await signOut();
     setEmail('');
     setPassword('');
   };
 
-  const handleSocialLogin = async (provider: 'google' | 'facebook') => {
-    setIsLoading(true);
-    setError('');
-
-    // Simulate social login API call
-    setTimeout(() => {
-      console.log(`Logging in with ${provider}`);
-      setIsLoggedIn(true);
-      setIsLoading(false);
-    }, 1000);
-  };
-
-  if (isLoggedIn) {
+  if (user) {
     return <Dashboard onLogout={handleLogout} />;
   }
 
@@ -66,35 +67,6 @@ function App() {
               </div>
               <h1 className="text-2xl font-bold text-gray-800 mb-2">Welcome back</h1>
               <p className="text-gray-600">Please enter your details to sign in</p>
-            </div>
-
-            {/* Social Login Buttons */}
-            <div className="space-y-3 mb-6">
-              <button
-                onClick={() => handleSocialLogin('google')}
-                className="w-full flex items-center justify-center gap-2 bg-white border border-gray-300 rounded-lg px-4 py-2 text-gray-700 hover:bg-gray-50 transition-colors"
-                disabled={isLoading}
-              >
-                <img src="https://www.google.com/favicon.ico" alt="Google" className="w-5 h-5" />
-                Continue with Google
-              </button>
-              <button
-                onClick={() => handleSocialLogin('facebook')}
-                className="w-full flex items-center justify-center gap-2 bg-[#1877F2] text-white rounded-lg px-4 py-2 hover:bg-[#1865F2] transition-colors"
-                disabled={isLoading}
-              >
-                <img src="https://www.facebook.com/favicon.ico" alt="Facebook" className="w-5 h-5" />
-                Continue with Facebook
-              </button>
-            </div>
-
-            <div className="relative my-6">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-300"></div>
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white text-gray-500">Or continue with email</span>
-              </div>
             </div>
 
             <form onSubmit={handleLogin} className="space-y-6">
