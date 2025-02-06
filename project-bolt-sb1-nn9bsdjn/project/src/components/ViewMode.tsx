@@ -70,22 +70,37 @@ function ViewMode({ maids, carpenters, onBack }: ViewModeProps) {
           {/* Service Provider List */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredData.map((item, index) => (
-              <div key={index} className="bg-gray-50 rounded-lg p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-semibold text-gray-900">{item.name}</h3>
-                  <div className="flex items-center text-yellow-500">
-                    <Star className="w-5 h-5 fill-current" />
-                    <span className="ml-1">{item.rating}</span>
+              <div key={index} className="bg-gray-50 rounded-lg overflow-hidden">
+                {item.image ? (
+                  <div className="aspect-w-16 aspect-h-12">
+                    <img
+                      src={item.image}
+                      alt={`${item.name}'s profile`}
+                      className="w-full h-48 object-cover"
+                    />
                   </div>
-                </div>
-                <div className="space-y-2 text-gray-600">
-                  <div className="flex items-center">
-                    <Phone className="w-4 h-4 mr-2" />
-                    <span>{item.phoneNumber}</span>
+                ) : (
+                  <div className="h-48 bg-gray-200 flex items-center justify-center">
+                    <span className="text-gray-400">No image available</span>
                   </div>
-                  <div className="flex items-center">
-                    <MapPin className="w-4 h-4 mr-2" />
-                    <span>{item.area}, {item.city}</span>
+                )}
+                <div className="p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg font-semibold text-gray-900">{item.name}</h3>
+                    <div className="flex items-center text-yellow-500">
+                      <Star className="w-5 h-5 fill-current" />
+                      <span className="ml-1">{item.rating}</span>
+                    </div>
+                  </div>
+                  <div className="space-y-2 text-gray-600">
+                    <div className="flex items-center">
+                      <Phone className="w-4 h-4 mr-2" />
+                      <span>{item.phoneNumber}</span>
+                    </div>
+                    <div className="flex items-center">
+                      <MapPin className="w-4 h-4 mr-2" />
+                      <span>{item.area}, {item.city}</span>
+                    </div>
                   </div>
                 </div>
               </div>
